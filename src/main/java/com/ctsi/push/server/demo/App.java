@@ -8,6 +8,7 @@ import com.ctsi.push.message.CommandAction;
 import com.ctsi.push.message.CommandMessage;
 import com.ctsi.push.message.PushResponse;
 import com.ctsi.push.server.tpush.TPushApi;
+import com.ctsi.push.server.tpush.TPushKeyStore;
 
 /**
  * Hello world!
@@ -20,9 +21,16 @@ public class App {
 
 
     //for TPush
-    private static final long accessId = 2100246413;
-    private static final String secretKey = "a6de544b196bad5bf14d0c3bbe5ca5ef";
-    static PushApi api = TPushApi.init(accessId, secretKey);
+    private static final long accessId_iOS =2200246531l;
+    private static final String secretKey_iOS  = "ba17d9c24cf17e40412241a7664be136";
+    private static final TPushKeyStore keystore_iOS=new TPushKeyStore(accessId_iOS,secretKey_iOS);
+
+    private static final long accessId_android =2100246530l;
+    private static final String secretKey_android  = "1c18da34353ee1a22c8d24a6ea9e0b64";
+    private static final TPushKeyStore keystore_android=new TPushKeyStore(accessId_android,secretKey_android);
+
+
+    static PushApi api = TPushApi.init(keystore_android, keystore_iOS);
 
     public static void main(String[] args) {
         System.out.println("Hello World!");
@@ -33,7 +41,7 @@ public class App {
         map.put("user", "liyao");
         map.put("id", "123");
 
-        CommandMessage message2 = CommandMessage.builder().timeExpire(0).toAlias("18911552161").noticeContent("测试title", "内容").commandAction(CommandAction.COMMAND_TYPE_URL, "http://www.baidu.com", map).build();
+        CommandMessage message2 = CommandMessage.builder().timeExpire(0).toAlias("13311097869").noticeContent("测试title", "内容").commandAction(CommandAction.COMMAND_TYPE_URL, "http://www.baidu.com", map).build();
 
         try {
             PushResponse response = api.push(message2);

@@ -23,20 +23,21 @@ import java.util.Map;
  */
 public class TPushApi implements PushApi {
 
-    private XingeApp xinge;
+    private XingeApp xinge_android, xinge_iOS;
     private Gson g = new Gson();
 
-    private TPushApi(long accessId, String secretKey) {
-        xinge = new XingeApp(accessId, secretKey);
+    private TPushApi(TPushKeyStore androidKeyStore, TPushKeyStore iOSKeyStore) {
+        xinge_android = new XingeApp(androidKeyStore.getAccessId(), androidKeyStore.getSecretKey());
+        xinge_iOS = new XingeApp(iOSKeyStore.getAccessId(), iOSKeyStore.getSecretKey());
     }
 
     private static TPushApi api = null;
 
-    public static TPushApi init(long accessId, String secretKey) {
+    public static TPushApi init(TPushKeyStore androidKeyStore, TPushKeyStore iOSKeyStore) {
         if (api == null) {
             synchronized (TPushApi.class) {
                 if (api == null) {
-                    api = new TPushApi(accessId, secretKey);
+                    api = new TPushApi(androidKeyStore, iOSKeyStore);
                 }
             }
         }
@@ -58,9 +59,9 @@ public class TPushApi implements PushApi {
         if (message == null)
             return new PushResponse("", -1, "CommamdMessage结构异常：" + message.toString());
         if (message.isHaveNoTags()) {
-            result = pushToAlias(xinge, message);
+            result = pushToAlias(message);
         } else if (message.isHaveNoAlias()) {
-            result = pushToTags(xinge, message);
+            result = pushToTags(message);
         }
         return responseConverter(result);
     }
@@ -72,6 +73,10 @@ public class TPushApi implements PushApi {
             if (result.getInt("ret_code") != 0) {
                 resultcode = -1;
                 sb.append("Error Message:");
+                sb.append(result.toString());
+                sb.append("\n");
+            } else {
+                sb.append("Success Message:");
                 sb.append(result.toString());
                 sb.append("\n");
             }
@@ -131,7 +136,7 @@ public class TPushApi implements PushApi {
     }
 
 
-    public ArrayList<JSONObject> pushToTags(XingeApp xinge, CommandMessage command) {
+    public ArrayList<JSONObject> pushToTags(CommandMessage command) {
         List<String> tagList = new ArrayList<String>();
         tagList.addAll(command.getTags());
         Message androidMessage = androidMessage(command);
@@ -140,17 +145,17 @@ public class TPushApi implements PushApi {
 
 
         if (androidMessage != null) {
-            JSONObject ret = xinge.pushTags(0, tagList, "OR", androidMessage);
+            JSONObject ret = xinge_android.pushTags(0, tagList, "OR", androidMessage);
             result.add(ret);
         }
         if (iOSMessage != null) {
-            JSONObject ret = xinge.pushTags(0, tagList, "OR", iOSMessage, XingeApp.IOSENV_DEV);
+            JSONObject ret = xinge_iOS.pushTags(0, tagList, "OR", iOSMessage, XingeApp.IOSENV_DEV);
             result.add(ret);
         }
         return result;
     }
 
-    public ArrayList<JSONObject> pushToAlias(XingeApp xinge, CommandMessage command) {
+    public ArrayList<JSONObject> pushToAlias(CommandMessage command) {
 
         List<String> accountList = new ArrayList<String>();
         accountList.addAll(command.getAlias());
@@ -158,11 +163,11 @@ public class TPushApi implements PushApi {
         MessageIOS iOSMessage = iOSMessage(command);
         ArrayList<JSONObject> result = new ArrayList<>();
         if (androidMessage != null) {
-            JSONObject ret = xinge.pushAccountList(0, accountList, androidMessage);
+            JSONObject ret = xinge_android.pushAccountList(0, accountList, androidMessage);
             result.add(ret);
         }
         if (iOSMessage != null) {
-            JSONObject ret = xinge.pushAccountList(0, accountList, iOSMessage, XingeApp.IOSENV_DEV);
+            JSONObject ret = xinge_iOS.pushAccountList(0, accountList, iOSMessage, XingeApp.IOSENV_DEV);
             result.add(ret);
         }
         return result;

@@ -66,7 +66,6 @@ public class JPushConverter {
 			messageBuilder.setMsgContent(noticeContent.getSubTitle());
 			iOSNoticeBuilder.setAlert(
 					IosAlert.newBuilder().setTitleAndBody(noticeContent.getTitle(), noticeContent.getSubTitle()).build());
-		
 		}
 		// 设置推送命令
 		CommandAction action = message.getCommandAction();

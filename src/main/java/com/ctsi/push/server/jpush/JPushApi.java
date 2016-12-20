@@ -8,6 +8,8 @@ import com.ctsi.push.message.PushResponse;
 import cn.jpush.api.push.PushClient;
 import cn.jpush.api.push.PushResult;
 import cn.jpush.api.push.model.PushPayload;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JPushApi implements PushApi {
 
@@ -15,13 +17,21 @@ public class JPushApi implements PushApi {
 
     // private String appKey="1008fb255a7f1b8bd339a745";
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+
     private String masterSecret;
     private String appKey;
 
     private static JPushApi api = null;
 
+
     private JPushApi(String masterSecret, String appKey) {
         refreshKeys(masterSecret, appKey);
+    }
+    private boolean debug = false;
+    public void setDebug(boolean debug) {
+        this.debug = debug;
     }
 
     private void refreshKeys(String masterSecret, String appKey) {
@@ -55,21 +65,23 @@ public class JPushApi implements PushApi {
 
     public PushResponse push(CommandMessage message) throws Exception {
         // TODO Auto-generated method stub
+        logger.info("JPush Push Message:{}", message.toString());
         PushClient pushClient = new PushClient(masterSecret, appKey);
-        PushPayload pushPayload = JPushConverter.messageConverter(message);
+        PushPayload pushPayload = JPushConverter.messageConverter(message, debug);
         try {
             PushResult result = pushClient.sendPush(pushPayload);//throws APIConnectionException, APIRequestException
             PushResponse response = JPushConverter.responseConverter(result);
             return response;
         } catch (APIRequestException ex) {
             if (ex.getErrorCode() == 1001) {//设备未注册
+                logger.info("JPush Push Message:{}", ex.getErrorMessage());
                 return new PushResponse("", PushResponse.ERROR_CODE_OK, ex.getErrorMessage());
             }
+            logger.error("JPush", ex);
             return new PushResponse("", ex.getErrorCode(), ex.getErrorMessage());//其他错误
         } catch (APIConnectionException ex) {
-
+            logger.error("JPush", ex);
             return new PushResponse("", -1, ex.getMessage());
-
         }
     }
 

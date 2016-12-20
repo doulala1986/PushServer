@@ -32,7 +32,7 @@ public class JPushConverter {
      * @param message
      * @return
      */
-    public static PushPayload messageConverter(CommandMessage message) {
+    public static PushPayload messageConverter(CommandMessage message, boolean debug) {
 
         PushPayload.Builder builder = PushPayload.newBuilder();
         builder.setPlatform(Platform.all());// 设置平台
@@ -107,7 +107,7 @@ public class JPushConverter {
          */
         Options.Builder optionBuilder = Options.newBuilder();
         optionBuilder.setTimeToLive(message.getExpire());
-//		optionBuilder.setApnsProduction(false);
+        optionBuilder.setApnsProduction(!debug);
         builder.setOptions(optionBuilder.build());
         return builder.build();
     }

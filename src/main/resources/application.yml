@@ -1,0 +1,3 @@
+logging:
+  file: push.log  #设置文件名称
+  level.com.ctsi : info

@@ -12,6 +12,8 @@ import com.tencent.xinge.MessageIOS;
 import com.tencent.xinge.TimeInterval;
 import com.tencent.xinge.XingeApp;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +27,8 @@ public class TPushApi implements PushApi {
 
     private XingeApp xinge_android, xinge_iOS;
     private Gson g = new Gson();
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private TPushApi(TPushKeyStore androidKeyStore, TPushKeyStore iOSKeyStore) {
         xinge_android = new XingeApp(androidKeyStore.getAccessId(), androidKeyStore.getSecretKey());
@@ -44,6 +48,11 @@ public class TPushApi implements PushApi {
         return api;
     }
 
+    private boolean debug = false;
+
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
 
     public static TPushApi get() {
         if (api == null) {
@@ -149,7 +158,7 @@ public class TPushApi implements PushApi {
             result.add(ret);
         }
         if (iOSMessage != null) {
-            JSONObject ret = xinge_iOS.pushTags(0, tagList, "OR", iOSMessage, XingeApp.IOSENV_DEV);
+            JSONObject ret = xinge_iOS.pushTags(0, tagList, "OR", iOSMessage, debug ? XingeApp.IOSENV_DEV : XingeApp.IOSENV_PROD);
             result.add(ret);
         }
         return result;
@@ -167,7 +176,7 @@ public class TPushApi implements PushApi {
             result.add(ret);
         }
         if (iOSMessage != null) {
-            JSONObject ret = xinge_iOS.pushAccountList(0, accountList, iOSMessage, XingeApp.IOSENV_DEV);
+            JSONObject ret = xinge_iOS.pushAccountList(0, accountList, iOSMessage, debug ? XingeApp.IOSENV_DEV : XingeApp.IOSENV_PROD);
             result.add(ret);
         }
         return result;

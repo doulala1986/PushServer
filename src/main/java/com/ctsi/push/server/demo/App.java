@@ -15,9 +15,9 @@ import com.ctsi.push.server.tpush.TPushKeyStore;
  */
 public class App {
     //for JPush
-    //	private static final String masterSecret = "693693b39093bd7bce4d8be2";
-    //	private static final String appKey = "f954367d81978289b4427797";
-    //	static PushApi api = JPushApi.init(masterSecret, appKey);
+    	private static final String masterSecret = "693693b39093bd7bce4d8be2";
+    	private static final String appKey = "f954367d81978289b4427797";
+    	static PushApi api = JPushApi.init(masterSecret, appKey);
 
 
     //for TPush
@@ -30,7 +30,7 @@ public class App {
     private static final TPushKeyStore keystore_android=new TPushKeyStore(accessId_android,secretKey_android);
 
 
-    static PushApi api = TPushApi.init(keystore_android, keystore_iOS);
+//    static PushApi api = TPushApi.init(keystore_android, keystore_iOS);
 
     public static void main(String[] args) {
         System.out.println("Hello World!");
@@ -41,7 +41,7 @@ public class App {
         map.put("user", "liyao");
         map.put("id", "123");
 
-        CommandMessage message2 = CommandMessage.builder().timeExpire(0).toAlias("13311097869").noticeContent("测试title", "内容").commandAction(CommandAction.COMMAND_TYPE_URL, "http://www.baidu.com", map).build();
+        CommandMessage message2 = CommandMessage.builder().timeExpire(0).toAlias("18911552163").commandAction(CommandAction.COMMAND_TYPE_URL, "http://www.baidu.com", map).build();
 
         try {
             PushResponse response = api.push(message2);
